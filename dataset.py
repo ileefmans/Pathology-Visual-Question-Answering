@@ -9,6 +9,30 @@ import torch
 import torchvision
 
 
+
+
+
+
+def missing_keys(folder_path):
+    missing_values = []
+    keys = {}
+    value = 885
+    for i in range(13,886):
+        path = os.path.join(folder_path, f'img_{str(i)}.jpg')
+        try:
+            Image.open(path)
+        except:
+            missing_values.append(i)
+            if i!=863:
+                keys[i] = value
+                value = value-1
+            else:
+                keys[i] = 862
+        finally:
+            pass
+    return missing_values, keys
+
+
 class train_dataset(torch.utils.data.Dataset):
     def __init__(self, root_dir, transform=None, channel='RGB'):
         """
@@ -25,7 +49,7 @@ class train_dataset(torch.utils.data.Dataset):
         self.root_dir = root_dir
         self.transform = transform
         self.channels = channel
-        self.num_figs = 819 + 873
+        self.num_figs = 819 + 850
 
     def __len__(self):
         return self.num_figs
@@ -34,8 +58,15 @@ class train_dataset(torch.utils.data.Dataset):
         
         if index<819:
             img_path = os.path.join(self.root_dir, f'Fig.{index}.jpg')
+            print(img_path)
         else:
-            img_path = os.path.join(self.root_dir, f'img_{index-806}.jpg')
+            missing_values, key_dict = missing_keys(self.root_dir)
+            if index-806 in missing_values:
+                img_path = os.path.join(self.root_dir, f'img_{key_dict[index-806]}.jpg')
+                print(img_path)
+            else:
+                img_path = os.path.join(self.root_dir, f'img_{index-806}.jpg')
+                print(img_path)
     
         image = Image.open(img_path)
         #--------------------------------------------------------------------------------
