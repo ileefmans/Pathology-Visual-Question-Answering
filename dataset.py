@@ -12,9 +12,8 @@ import torchvision
 
 
 
-
+# Function to generate keys and values for missing indices in first train folder
 def missing_keys(folder_path):
-    #missing_values = []
     keys = {}
     value = 885
     for i in range(13,886):
@@ -22,7 +21,6 @@ def missing_keys(folder_path):
         try:
             Image.open(path)
         except:
-            #missing_values.append(i)
             if i!=863:
                 keys[i] = value
                 value = value-1
@@ -32,9 +30,27 @@ def missing_keys(folder_path):
             pass
     return keys
 
+# Function to generate dictionary for path to second train folder
+def path_dict(folder_path):
+    dic = {}
+    for i in range(3329):
+        for j in range(78):
+            path = os.path.join(folder_path ,f'part2/part2_images/{str(j)}', f'{str(i)}.jpg')
+            try:
+                image = Image.open(path)
+                dic[i] = j
+            except:
+                pass
+            finally:
+                pass
 
+    return dic
+
+
+
+# Class to create dataset
 class train_dataset(torch.utils.data.Dataset):
-    def __init__(self, train_dict_1, root_dir, transform=None, channel='RGB'):
+    def __init__(self, train_dict1, train_dict2, root_dir, transform=None, channel='RGB'):
         """
         Args:
             root_dir (string): Train Directory with images
@@ -47,11 +63,12 @@ class train_dataset(torch.utils.data.Dataset):
         """
 
         self.root_dir = root_dir
-        self.key_dict = train_dict_1
-        self.missing_values = train_dict_1.keys()
+        self.key_dict = train_dict1
+        self.missing_values = train_dict1.keys()
+        self.train_dict2 = train_dict2
         self.transform = transform
         self.channels = channel
-        self.num_figs = 819 + 850
+        self.num_figs = 819 + 850 + 3329 #(819 +850): first folder, 3329: second folder
 
     def __len__(self):
         return self.num_figs
@@ -64,20 +81,15 @@ class train_dataset(torch.utils.data.Dataset):
             img_path = os.path.join(self.root_dir, f'part1/Images/Fig.{index}.jpg')
             print(img_path)
         elif index<1670:
-            #missing_values, key_dict = missing_keys(self.root_dir)
             if index-806 in self.missing_values:
                 img_path = os.path.join(self.root_dir, f'part1/Images/img_{self.key_dict[index-806]}.jpg')
                 print(img_path)
             else:
                 img_path = os.path.join(self.root_dir, f'part1/Images/img_{index-806}.jpg')
                 print(img_path)
-        #--------------------------------------------------------------------------------
-        
-        #else:
-        #img_path = os.path.join(
-        
-        #--------------------------------------------------------------------------------
-
+        else:
+            img_path = os.path.join(self.root_dir, f'part2/part2_images/{self.train_dict2[index-1670]}/{index-1670}.jpg')
+            print(img_path)
 
     
         image = Image.open(img_path)
