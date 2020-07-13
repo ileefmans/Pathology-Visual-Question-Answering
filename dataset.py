@@ -11,25 +11,6 @@ import torchvision
 
 
 
-
-# Function to generate keys and values for missing indices in first train folder
-def missing_keys(folder_path):
-    keys = {}
-    value = 885
-    for i in range(13,886):
-        path = os.path.join(folder_path, f'part1/Images/img_{str(i)}.jpg')
-        try:
-            Image.open(path)
-        except:
-            if i!=863:
-                keys[i] = value
-                value = value-1
-            else:
-                keys[i] = 862
-        finally:
-            pass
-    return keys
-
 # Function to generate dictionary for path to second train folder
 def path_dict(folder_path):
     dic = {}
@@ -48,52 +29,46 @@ def path_dict(folder_path):
 
 
 
-# Class to create dataset
+# Class to create dataset with annotation
 class train_dataset(torch.utils.data.Dataset):
-    def __init__(self, train_dict1, train_dict2, root_dir, transform=None, channel='RGB'):
+    def __init__(self, annotation_dir, train_dict, img_dir, transform=None, channel='RGB'):
         """
-        Args:
-            root_dir (string): Train Directory with images
-            train_dict_1 (dictionary): Dictionary containing keys corresponding to missing indexes
-                in the first train image folder and the alternate values to be assigned to these indexes
+            Args:
+            img_dir (string): Train Directory with images
+            
+            train_dict (dictionary): Dictionary containing folder and image matches for second part of 
+                train data
+                
             transform (callable, optional): Optional transform to be applied
-                on a sample
+            on a sample
+            
             channels (string): ['RGB'(default), 'CMYK'] color channels to convert
                 all images to
-        """
-
-        self.root_dir = root_dir
-        self.key_dict = train_dict1
-        self.missing_values = train_dict1.keys()
-        self.train_dict2 = train_dict2
+            """
+        
+        self.img_dir = img_dir
+        self.annotation = pd.read_json(annotation_dir)
+        self.new_annotation = self.annotation.loc[self.annotation.Images!='img_233',:].reset_index()
+        self.train_dict2 = train_dict
         self.transform = transform
         self.channels = channel
-        self.num_figs = 819 + 850 + 3329 #(819 +850): first folder, 3329: second folder
-
+    
     def __len__(self):
-        return self.num_figs
-
+        return len(self.new_annotation)
+    
     def __getitem__(self, index):
         
-        if index==0:
-            img_path = os.path.join(self.root_dir, f'part1/Images/Fig.{index+819}.jpg')
-        elif index<819:
-            img_path = os.path.join(self.root_dir, f'part1/Images/Fig.{index}.jpg')
-            print(img_path)
-        elif index<1670:
-            if index-806 in self.missing_values:
-                img_path = os.path.join(self.root_dir, f'part1/Images/img_{self.key_dict[index-806]}.jpg')
-                print(img_path)
-            else:
-                img_path = os.path.join(self.root_dir, f'part1/Images/img_{index-806}.jpg')
-                print(img_path)
-        else:
-            img_path = os.path.join(self.root_dir, f'part2/part2_images/{self.train_dict2[index-1670]}/{index-1670}.jpg')
-            print(img_path)
+        image_name = self.new_annotation.Images[index]
 
+        if image_name[0] in ['F','i']:
+            img_path = os.path.join(self.img_dir, f'part1/Images/{image_name}.jpg')
+            print(img_path)
+        else:
+            img_path = os.path.join(self.img_dir, f'part2/part2_images/{self.train_dict2[int(image_name[:-4])]}/{image_name}')
+            print(img_path)
     
         image = Image.open(img_path)
-                                    
+        
         if self.channels=='RGB':
             if image.mode=='CMYK':
                 image = image.convert('RGB')
@@ -103,10 +78,17 @@ class train_dataset(torch.utils.data.Dataset):
         else:
             print("Invalid Channel Type")
 
-        
+
         if self.transform:
             image = self.transform(image)
-        sample = {'image': image}
-        
-        return sample
+
+
+
+        question = self.new_annotation.Questions[index]
+        answer = self.new_annotation.Answers[index]
+        sample = {'image': image, 'question': question, answer: 'answer'}
     
+        return sample
+
+
+
