@@ -86,7 +86,7 @@ class train_dataset(torch.utils.data.Dataset):
 
         question = self.new_annotation.Questions[index]
         answer = self.new_annotation.Answers[index]
-        sample = {'image': image, 'question': question, answer: 'answer'}
+        sample = {'image': image, 'question': question, 'answer': answer}
     
         return sample
 
