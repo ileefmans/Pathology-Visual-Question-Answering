@@ -6,6 +6,7 @@ from matplotlib import pyplot as plt
 from skimage import io, transform
 
 import torch
+from torch import nn
 import torchvision
 
 
@@ -37,7 +38,7 @@ def expand(image, largest_dimension, resample=0):
     #Image.LANCZOS
     if image.height>= image.width:
         new_width = round((image.width/image.height)*largest_dimension)
-        new_height = largest_dimesion
+        new_height = largest_dimension
     else:
         new_height = round((image.height/image.width)*largest_dimension)
         new_width = largest_dimension
@@ -109,11 +110,11 @@ class train_dataset(torch.utils.data.Dataset):
         #elif self.channels=='CMYK':
             #if image.mode=='RGB':
                 #image = image.convert('CMYK')
-        else:
-            print("Invalid Channel Type")
+        #else:
+            #print("Invalid Channel Type")
 
-        if img_size[0] == img_size[1]:
-            image = expand(image, img_size[0])
+        if self.img_size[0] == self.img_size[1]:
+            image = expand(image, self.img_size[0])
         else:
             raise Exception("Attribute Error: Image size must be square")
         
@@ -122,7 +123,7 @@ class train_dataset(torch.utils.data.Dataset):
         if self.transform:
             image = self.transform(image)
         
-        image = uniform_size(image, img_size[0], img_size[1])
+        image = uniform_size(image, self.img_size[0], self.img_size[1])
         
 
 
