@@ -30,20 +30,28 @@ def path_dict(folder_path):
 
 
 # Function to expand or reduce size of image keeping aspect ration intact
-def expand(image, largest_dimension, resample=0):
+def expand(image, desired_dimensions, resample=0):
+    #desired_dimensions (tuple): (height, width)
     #resample options (see Pil.Image.resize for more documentation):
     #0 :Nearest neighbors (default)
     #PIL.Image.BILINEAR
     #Image.BICUBIC
     #Image.LANCZOS
-    if image.height>= image.width:
-        new_width = round((image.width/image.height)*largest_dimension)
-        new_height = largest_dimension
+    
+    new_width = round((image.width/image.height)*desired_dimensions[0])
+    new_height = round((image.height/image.width)*desired_dimensions[1])
+    
+    if new_width<= desired_dimensions[1]:
+        new_height = desired_dimensions[0]
+    elif new_height<= desired_dimensions[0]:
+        new_width = desired_dimensions[1]
     else:
-        new_height = round((image.height/image.width)*largest_dimension)
-        new_width = largest_dimension
+        raise Exception("Error in expand() go back and check how images are resized")
+    
     image = image.resize((new_width, new_height), resample=resample )
     return image
+
+
 
 # Function to add padding to make pictures uniform size
 def uniform_size(x, height, width):
@@ -62,7 +70,7 @@ def uniform_size(x, height, width):
 
 # Class to create dataset with annotation
 class train_dataset(torch.utils.data.Dataset):
-    def __init__(self, annotation_dir, train_dict, img_dir, transform=None, img_size=(600,600)):
+    def __init__(self, annotation_dir, train_dict, img_dir, transform=None, img_size=(491, 600)):
         """
             Args:
             
@@ -105,7 +113,7 @@ class train_dataset(torch.utils.data.Dataset):
         image = Image.open(img_path)
         
         #if self.channels=='RGB':
-        if image.mode=='CMYK':
+        if image.mode != 'RGB':
             image = image.convert('RGB')
         #elif self.channels=='CMYK':
             #if image.mode=='RGB':
@@ -113,10 +121,7 @@ class train_dataset(torch.utils.data.Dataset):
         #else:
             #print("Invalid Channel Type")
 
-        if self.img_size[0] == self.img_size[1]:
-            image = expand(image, self.img_size[0])
-        else:
-            raise Exception("Attribute Error: Image size must be square")
+        image = expand(image, self.img_size)
         
 
 
