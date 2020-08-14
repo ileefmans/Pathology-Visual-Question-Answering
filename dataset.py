@@ -14,6 +14,7 @@ from preprocess import image_process
 
 
 
+
 # Function to generate dictionary for path to second train folder
 def path_dict(folder_path):
     dic = {}
@@ -90,8 +91,13 @@ class train_dataset(torch.utils.data.Dataset):
         
         image = self.preprocess.uniform_size(image)
         
-
+        
+        
         question = self.new_annotation.Questions[index]
+        #print(question)
+        #print(type(question))
+        #cln_txt= text_process(question)
+        #question = cln_txt.text_preprocess()
         answer = self.new_annotation.Answers[index]
         sample = {'image': image, 'question': question, 'answer': answer}
     
