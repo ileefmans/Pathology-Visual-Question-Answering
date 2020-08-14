@@ -48,6 +48,8 @@ class VAE(nn.Module):
             nn.ConvTranspose2d(3, num_features, 5)
 
         )
+    
+    
 
 
     def reparameterize(self, mu, logvar):
@@ -58,10 +60,12 @@ class VAE(nn.Module):
     def forward(self, x):
         x = self.Encoder(x)
         print(x.size())
-        #x = nn.Linear(x.size(1), 2*x.size(1))
-        #print(x.size())
-        #x = x.view(-1, 2, x.size(1)/2)
-        #print(x.size())
+        x = x.view(-1, 2, int(x.size(1)/2))
+        print(x.size())
+        x = self.reparameterize(x[:,0,:], x[:,1,:])
+        print(x.size())
+        fc = nn.Linear(x.size(1), x.size(1)*2)
+        x = fc(x)
         return x
 
 
