@@ -11,6 +11,9 @@ import os
 
 
 class Flatten(nn.Module):
+    def __init__(self, dimensions):
+        self.dim1 = dimensions[0]
+        self.dim2 = dimensions[1]
     def forward(self, x):
         return x.view(x.size(0), -1)
 
@@ -58,10 +61,17 @@ class VAE(nn.Module):
         self.conv2 = nn.Conv2d(num_features, num_features*2, 5)
         self.conv3 = nn.Conv2d(num_features*2, num_features*4, 5)
         self.conv4 = nn.Conv2d(num_features*4, num_features*8, 5)
+        
+        self.convT1 = nn.ConvTranspose2d(num_features*4, num_fetures*4, 5)
+        self.convT2 = nn.ConvTranspose2d(num_features*4, num_fetures*2, 5)
+        self.convT3 = nn.ConvTranspose2d(num_features*2, num_fetures, 5)
+        self.convT4 = nn.ConvTranspose2d(num_features, 3, 5)
+        
         self.pool = nn.MaxPool2d(kernel_size=2)
         self.relu = nn.ReLU()
         self.flatten = Flatten()
         self.fold = Fold()
+        self.unflatten = Unflatten()
         
 
         self.Decoder = nn.Sequential(
