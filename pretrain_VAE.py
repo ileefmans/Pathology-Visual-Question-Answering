@@ -19,6 +19,15 @@ class Unflatten(nn.Module):
         #return x.view
         pass
 
+class Fold(nn.Module):
+    def forward(self, x):
+        return x.view(-1, 2, int(x.size(1)/2))
+
+#class Print_Size(nn.Module):
+    #def forward(self, x):
+    #print(x.size())
+    #return x
+
 
 class VAE(nn.Module):
     
@@ -28,21 +37,32 @@ class VAE(nn.Module):
     def __init__(self, num_features):
         super(VAE, self).__init__()
         
-        self.Encoder = nn.Sequential(
-            nn.Conv2d(3, num_features, 5),
-            nn.MaxPool2d(kernel_size=2),
-            nn.ReLU(),
-            nn.Conv2d(num_features, num_features*2, 5),
-            nn.MaxPool2d(kernel_size=2),
-            nn.ReLU(),
-            nn.Conv2d(num_features*2, num_features*4, 5),
-            nn.MaxPool2d(kernel_size=2),
-            nn.ReLU(),
-            nn.Conv2d(num_features*4, num_features*8, 5),
-            nn.MaxPool2d(kernel_size=2),
-            nn.ReLU(),
-            Flatten()
-        )
+        #self.Encoder = nn.Sequential(
+            #nn.Conv2d(3, num_features, 5),
+            #nn.MaxPool2d(kernel_size=2),
+            #nn.ReLU(),
+            #nn.Conv2d(num_features, num_features*2, 5),
+            #nn.MaxPool2d(kernel_size=2),
+            #nn.ReLU(),
+            #nn.Conv2d(num_features*2, num_features*4, 5),
+            #nn.MaxPool2d(kernel_size=2),
+            #nn.ReLU(),
+            #nn.Conv2d(num_features*4, num_features*8, 5),
+            #nn.MaxPool2d(kernel_size=2),
+            #nn.ReLU(),
+            #Print_Size(),
+            #Flatten()
+            #)
+        
+        self.conv1 = nn.Conv2d(3, num_features, 5)
+        self.conv2 = nn.Conv2d(num_features, num_features*2, 5)
+        self.conv3 = nn.Conv2d(num_features*2, num_features*4, 5)
+        self.conv4 = nn.Conv2d(num_features*4, num_features*8, 5)
+        self.pool = nn.MaxPool2d(kernel_size=2)
+        self.relu = nn.ReLU()
+        self.flatten = Flatten()
+        self.fold = Fold()
+        
 
         self.Decoder = nn.Sequential(
             nn.ConvTranspose2d(3, num_features, 5)
@@ -50,6 +70,27 @@ class VAE(nn.Module):
         )
     
     
+    def Encoder(self, x):
+        x = self.conv1(x)
+        x, idx1 = self.pool(x)
+        x = self.relu
+        x = self.conv2(x)
+        x, idx2 = self.pool(x)
+        x = self.relu(x)
+        x = self.conv3(x)
+        x, idx3 = self.pool(x)
+        x = self.relu(x)
+        x = self.conv4(x)
+        x, idx4 = self.pool(x)
+        x = self.relu(x)
+        x = self.flatten(x)
+        x = self.fold(x)
+        return x, idx1, idx2, idx3, idx4
+    
+    def Decoder(self, x):
+        
+    
+        pass
 
 
     def reparameterize(self, mu, logvar):
@@ -64,8 +105,7 @@ class VAE(nn.Module):
         print(x.size())
         x = self.reparameterize(x[:,0,:], x[:,1,:])
         print(x.size())
-        fc = nn.Linear(x.size(1), x.size(1)*2)
-        x = fc(x)
+        
         return x
 
 
