@@ -15,7 +15,9 @@ class Flatten(nn.Module):
         return x.view(x.size(0), -1)
 
 class Unflatten(nn.Module):
-    def __init__(self, dimensions):
+    def __init__(self, x, dimensions=(26,33)):
+        super(Unflatten, self).__init__()
+        
         self.dim1 = dimensions[0]
         self.dim2 = dimensions[1]
     def forward(self, x):
@@ -45,9 +47,9 @@ class VAE(nn.Module):
         self.conv3 = nn.Conv2d(num_features*2, num_features*4, 5)
         self.conv4 = nn.Conv2d(num_features*4, num_features*8, 5)
         
-        self.convT1 = nn.ConvTranspose2d(num_features*4, num_fetures*4, 5)
-        self.convT2 = nn.ConvTranspose2d(num_features*4, num_fetures*2, 5)
-        self.convT3 = nn.ConvTranspose2d(num_features*2, num_fetures, 5)
+        self.convT1 = nn.ConvTranspose2d(num_features*8, num_features*4, 5)
+        self.convT2 = nn.ConvTranspose2d(num_features*4, num_features*2, 5)
+        self.convT3 = nn.ConvTranspose2d(num_features*2, num_features, 5)
         self.convT4 = nn.ConvTranspose2d(num_features, 3, 5)
         
         
@@ -56,62 +58,80 @@ class VAE(nn.Module):
         self.relu = nn.ReLU()
         self.flatten = Flatten()
         self.fold = Fold()
-        self.unflatten = Unflatten()
+        #self.unflatten = Unflatten()
+        self.num_features = num_features
         
 
     
     
     def Encoder(self, x):
         x = self.conv1(x)
+        dim1 = x.size()
         x, idx1 = self.pool(x)
-        x = self.relu
+        x = self.relu(x)
         x = self.conv2(x)
+        dim2 = x.size()
         x, idx2 = self.pool(x)
         x = self.relu(x)
         x = self.conv3(x)
+        dim3 = x.size()
         x, idx3 = self.pool(x)
         x = self.relu(x)
         x = self.conv4(x)
+        dim4 = x.size()
         x, idx4 = self.pool(x)
         x = self.relu(x)
+        pic_dim = (x.size(2), x.size(3))
         x = self.flatten(x)
         x = self.fold(x)
-        return x, idx1, idx2, idx3, idx4
+        idx = [idx1, idx2, idx3, idx4]
+        prepool_dim = [dim1, dim2, dim3, dim4]
+        return x, idx, pic_dim, prepool_dim
     
-    def Decoder(self, x, idx1, idx2, idx3, idx4):
+    def Decoder(self, x, idx, prepool_dim):
         
-        unpool1 = nn.MaxUnpool2d(kernel_size=2, idx1)
-        unpool2 = nn.MaxUnpool2d(kernel_size=2, idx2)
-        unpool3 = nn.MaxUnpool2d(kernel_size=2, idx3)
-        unpool4 = nn.MaxUnpool2d(kernel_size=2, idx4)
+        unpool1 = nn.MaxUnpool2d(kernel_size=2) #output_size = torch.Size([-1, 64, 26, 33])
+        unpool2 = nn.MaxUnpool2d(kernel_size=2)
+        unpool3 = nn.MaxUnpool2d(kernel_size=2)
+        unpool4 = nn.MaxUnpool2d(kernel_size=2)
         
+        x = unpool1(x, idx[3], prepool_dim[3])
         x = self.convT1(x)
-        x = unpool1(x)
         x = self.relu(x)
+        x = unpool2(x, idx[2], prepool_dim[2])
         x = self.convT2(x)
-        x = unpool2(x)
         x = self.relu(x)
+        x = unpool3(x, idx[1], prepool_dim[1])
         x = self.convT3(x)
-        x = self.unpool3(x)
         x = self.relu(x)
+        x = unpool4(x, idx[0], prepool_dim[0])
         x = self.convT4(x)
-        x = self.unpool4(x)
         x = self.relu(x)
         return x
         
 
 
     def reparameterize(self, mu, logvar):
-        std = logvar.mul(0.5).exp_()
+        std= logvar.mul(0.5).exp_()
+        eps1 = std.data.new(std.size()).normal_()
         eps = std.data.new(std.size()).normal_()
-        return eps.mul(std).add_(mu)
+        return torch.cat((eps1.mul(std).add_(mu), eps.mul(std).add_(mu)), 1)
 
     def forward(self, x):
-        x, idx1, idx2, idx3, idx4 = self.Encoder(x)
-        print(x.size())
+        x, idx, dimensions, prepool_dim = self.Encoder(x)
+        print("1,", x.size())
         x = self.reparameterize(x[:,0,:], x[:,1,:])
-        print(x.size())
-        x = self.unflatten(x)
+        print("2", x.size())
+        #unflatten = Unflatten(dimensions=dimensions)
+        #x = unflatten(x)
+        x = x.view(x.size(0), self.num_features*8, dimensions[0], dimensions[1])
+        print("3", x.size())
+        #upsample = nn.Upsample((x.size(0), 2*x.size(1), x.size(2), x.size(3)))
+        #x = upsample(x)
+        #print("4", x.size())
+        x = self.Decoder(x, idx, prepool_dim)
+        print("4", x.size())
+        
         
         return x
 
