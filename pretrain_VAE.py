@@ -11,10 +11,22 @@ import os
 
 
 class Flatten(nn.Module):
+    
+    """
+        Module which flattens tensor to a 1D tensor
+    """
+    
     def forward(self, x):
         return x.view(x.size(0), -1)
 
+
+
 class Unflatten(nn.Module):
+    
+    """
+        Module which reformats flattened tensor into original format
+    """
+    
     def __init__(self, x, num_features=None, dimensions=None):
         super(Unflatten, self).__init__()
         
@@ -27,7 +39,15 @@ class Unflatten(nn.Module):
         
         return x.view(x.size(0), self.num_features*8, self.dimensions[0], self.dimensions[1])
 
+
+
+
 class Fold(nn.Module):
+    
+    """
+        Module which folds 1D tensor (1 X n) resulting in a (2 X n/d) tensor
+    """
+    
     def forward(self, x):
         return x.view(-1, 2, int(x.size(1)/2))
 
