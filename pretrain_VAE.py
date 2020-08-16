@@ -15,23 +15,22 @@ class Flatten(nn.Module):
         return x.view(x.size(0), -1)
 
 class Unflatten(nn.Module):
-    def __init__(self, x, dimensions=(26,33)):
+    def __init__(self, x, num_features=None, dimensions=None):
         super(Unflatten, self).__init__()
         
-        self.dim1 = dimensions[0]
-        self.dim2 = dimensions[1]
+        self.dimensions = dimensions
+        self.num_features = num_features
+    
     def forward(self, x):
-        return x.view(x.size(0), num_features*4, self.dim1, self.dim2)
+        if self.num_features==None or self.dimensions==None:
+            raise Exception("Mandatory argument not assigned")
+        
+        return x.view(x.size(0), self.num_features*8, self.dimensions[0], self.dimensions[1])
 
 class Fold(nn.Module):
     def forward(self, x):
         return x.view(-1, 2, int(x.size(1)/2))
 
-
-#class Print_Size(nn.Module):
-    #def forward(self, x):
-    #print(x.size())
-    #return x
 
 
 class VAE(nn.Module):
@@ -58,7 +57,6 @@ class VAE(nn.Module):
         self.relu = nn.ReLU()
         self.flatten = Flatten()
         self.fold = Fold()
-        #self.unflatten = Unflatten()
         self.num_features = num_features
         
 
@@ -90,7 +88,7 @@ class VAE(nn.Module):
     
     def Decoder(self, x, idx, prepool_dim):
         
-        unpool1 = nn.MaxUnpool2d(kernel_size=2) #output_size = torch.Size([-1, 64, 26, 33])
+        unpool1 = nn.MaxUnpool2d(kernel_size=2)
         unpool2 = nn.MaxUnpool2d(kernel_size=2)
         unpool3 = nn.MaxUnpool2d(kernel_size=2)
         unpool4 = nn.MaxUnpool2d(kernel_size=2)
@@ -122,13 +120,9 @@ class VAE(nn.Module):
         print("1,", x.size())
         x = self.reparameterize(x[:,0,:], x[:,1,:])
         print("2", x.size())
-        #unflatten = Unflatten(dimensions=dimensions)
-        #x = unflatten(x)
-        x = x.view(x.size(0), self.num_features*8, dimensions[0], dimensions[1])
+        unflatten = Unflatten(x, dimensions=dimensions, num_features = self.num_features)
+        x = unflatten(x)
         print("3", x.size())
-        #upsample = nn.Upsample((x.size(0), 2*x.size(1), x.size(2), x.size(3)))
-        #x = upsample(x)
-        #print("4", x.size())
         x = self.Decoder(x, idx, prepool_dim)
         print("4", x.size())
         
