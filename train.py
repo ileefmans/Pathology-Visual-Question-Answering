@@ -85,12 +85,29 @@ class Trainer:
     def train(self):
         codes = dict(mulis=list(), logsig2=list(), y=list())
         for epoch in range(0, self.epochs+1):
+            
+            #Training
             if epoch>0:
                 self.vae.train()
                 train_loss=0
+                i = 1
                 for x in self.train_loader:
                     x = x["image"].to(self.device)
                     x_hat, mu, logvar = self.vae(x)
+                    loss = self.loss_fcn(x_hat, x, mu, logvar)
+                    train_loss += loss
+                    self.optim.zero_grad()
+                    loss.backward()
+                    self.optim.step()
+                    print('minibatch:', i)
+                    i+=1
+                print(f'====> Epoch: {epoch} Average loss: {train_loss / len(self.train_loader):.4f}')
+
+
+            #Testing
+
+
+
 
 
 
