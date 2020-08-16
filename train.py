@@ -89,6 +89,9 @@ class Trainer:
                 self.vae.train()
                 train_loss=0
                 for x in self.train_loader:
+                    x = x["image"].to(self.device)
+                    x_hat, mu, logvar = self.vae(x)
+
 
 
 

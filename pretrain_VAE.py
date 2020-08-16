@@ -143,7 +143,9 @@ class VAE(nn.Module):
     def forward(self, x):
         x, idx, dimensions, prepool_dim = self.Encoder(x)
         print("1,", x.size())
-        x = self.reparameterize(x[:,0,:], x[:,1,:])
+        mu = x[:,0,:]
+        logvar = x[:,1,:]
+        x = self.reparameterize(mu, logvar)
         print("2", x.size())
         unflatten = Unflatten(x, dimensions=dimensions, num_features = self.num_features)
         x = unflatten(x)
@@ -152,7 +154,7 @@ class VAE(nn.Module):
         print("4", x.size())
         
         
-        return x
+        return x, mu, logvar
 
 
 

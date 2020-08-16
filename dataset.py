@@ -71,10 +71,10 @@ class train_dataset(torch.utils.data.Dataset):
 
         if image_name[0] in ['F','i']:
             img_path = os.path.join(self.img_dir, f'part1/Images/{image_name}.jpg')
-            print(img_path)
+            #print(img_path)
         else:
             img_path = os.path.join(self.img_dir, f'part2/part2_images/{self.train_dict2[int(image_name[:-4])]}/{image_name}')
-            print(img_path)
+            #print(img_path)
     
         image = Image.open(img_path)
         
