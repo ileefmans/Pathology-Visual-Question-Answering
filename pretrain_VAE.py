@@ -83,6 +83,11 @@ class VAE(nn.Module):
     
     
     def Encoder(self, x):
+        
+        """
+            Encoder segment of Variational AutoEncoder
+        """
+        
         x = self.conv1(x)
         dim1 = x.size()
         x, idx1 = self.pool(x)
