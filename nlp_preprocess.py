@@ -68,30 +68,30 @@ class text_process:
             Converts list of comma-separated 'documents' to a vector, using tf-idf. This is done after stop words 
             have been removed (with remove_stopwords()). Utilizes the keras tokenizer, which separates on spaces, 
             makes all tokens lowercase and removes punctuation. Function then stems the tokens, using the 
-            PorterStemmer from nltk. Finally, it returns the preprocessed tokens in vector form.
+            PorterStemmer from nltk. Finally, it returns the preprocessed tokens in matrix form.
             
         """
 
         
         ## Keras tokenizer
         
-        tok = Tokenizer()
-        tok.fit_on_texts(doc_list)
+        tok = Tokenizer(oov_token='<UNK>')
         
-        tokens = list(tok.word_counts)
         
         ## Stem words 
         
         ps = PorterStemmer()
-        for i in range(len(tokens)): #i = question index (i.e. question1, question2, etc...)
-            tokens[i] = (ps.stem(tokens[i]))
+        for i in range(len(doc_list)):  #i = question index (i.e. question1, question2, etc...)
+            for j in range(len(doc_list[i])):
+                doc_list[i][j] = (ps.stem(doc_list[i][j]))
         
-        ## Return tf-idf matrix
         
-        matrx = tok.texts_to_matrix(tokens, mode='tfidf')
+        ## Fit on doc list & return tf-idf matrix
         
-        return matrx, tok.get_config()
-    
+        tok.fit_on_texts(doc_list)
+        matrx = tok.texts_to_matrix(doc_list, mode='tfidf')
+        
+        return matrx, tok.get_config(), doc_list
     
     def text_preprocess(self):
 
