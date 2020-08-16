@@ -33,6 +33,32 @@ def path_dict(folder_path):
 
 
 
+# Generalizing the above functions
+
+def path_dict(folder_path, total_pics, total_folders):
+    dic = {}
+    for i in range(total_pics):
+        for j in range(total_folders):
+            path = os.path.join(folder_path ,f'part2/part2_images/{str(j)}', f'{str(i)}.jpg')
+            try:
+                image = Image.open(path)
+                dic[i] = j
+            except:
+                pass
+            finally:
+                pass
+
+    return dic
+
+
+
+
+
+
+
+
+
+
 # Class to create dataset with annotation
 class train_dataset(torch.utils.data.Dataset):
     def __init__(self, annotation_dir, train_dict, img_dir, transform=None, img_size=(491, 600)):

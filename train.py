@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import argparse
 from matplotlib import pyplot as plt
+from IPython import display
 
 import torch
 from torch import nn
@@ -39,7 +40,7 @@ class Trainer:
         
         # initialize arguments
         self.ops = get_args()
-        self.device = "cuda"
+        self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.annotation_path = self.ops.annotation_path
         self.train_img_path = self.ops.train_img_path
         self.index_dict = path_dict(self.train_img_path)
@@ -48,7 +49,7 @@ class Trainer:
         self.num_channels = self.ops.number_of_channels
         self.learning_rate = self.ops.learning_rate
         self.height = 491
-        self.wdith = 600
+        self.width = 600
         self.epochs = self.ops.epochs
         
         
@@ -64,7 +65,7 @@ class Trainer:
         
         
         #initialize optimizer
-        self.optim = torch.optim.Adam(self.model.parameters(), lr = self.learning_rate)
+        self.optim = torch.optim.Adam(self.vae.parameters(), lr = self.learning_rate)
     
     
     # Loss Function
@@ -99,7 +100,12 @@ class Trainer:
                     self.optim.zero_grad()
                     loss.backward()
                     self.optim.step()
-                    print('minibatch:', i)
+                    #print('minibatch:', i)
+                    
+                    print("[EPOCH]: %i, [MINIBATCH]: %i,   %.2f [PERCENT COMPLETED]" % (epoch, i, (i/len(self.train_loader))*100))
+                    display.clear_output(wait=True)
+    
+                    
                     i+=1
                 print(f'====> Epoch: {epoch} Average loss: {train_loss / len(self.train_loader):.4f}')
 
@@ -123,7 +129,7 @@ class Trainer:
 
 if __name__ == "__main__":
     trainer = Trainer()
-    trainer.testing()
+    trainer.train()
 
 
 

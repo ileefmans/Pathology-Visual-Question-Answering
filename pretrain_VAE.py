@@ -75,6 +75,7 @@ class VAE(nn.Module):
         self.pool = nn.MaxPool2d(kernel_size=2, return_indices=True)
         self.unpool = nn.MaxUnpool2d(kernel_size=2)
         self.relu = nn.ReLU()
+        self.sigmoid = nn.Sigmoid()
         self.flatten = Flatten()
         self.fold = Fold()
         self.num_features = num_features
@@ -129,7 +130,7 @@ class VAE(nn.Module):
         x = self.relu(x)
         x = unpool4(x, idx[0], prepool_dim[0])
         x = self.convT4(x)
-        x = self.relu(x)
+        x = self.sigmoid(x)
         return x
         
 
@@ -142,16 +143,16 @@ class VAE(nn.Module):
 
     def forward(self, x):
         x, idx, dimensions, prepool_dim = self.Encoder(x)
-        print("1,", x.size())
+        #print("1,", x.size())
         mu = x[:,0,:]
         logvar = x[:,1,:]
         x = self.reparameterize(mu, logvar)
-        print("2", x.size())
+        #print("2", x.size())
         unflatten = Unflatten(x, dimensions=dimensions, num_features = self.num_features)
         x = unflatten(x)
-        print("3", x.size())
+        #print("3", x.size())
         x = self.Decoder(x, idx, prepool_dim)
-        print("4", x.size())
+        #print("4", x.size())
         
         
         return x, mu, logvar
