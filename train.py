@@ -43,7 +43,7 @@ class Trainer:
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.annotation_path = self.ops.annotation_path
         self.train_img_path = self.ops.train_img_path
-        self.index_dict = path_dict(self.train_img_path)
+        self.train_index_dict = path_dict(self.train_img_path, 3328, 77)
         self.transform = torchvision.transforms.ToTensor()
         self.batch_size = self.ops.batch_size
         self.num_channels = self.ops.number_of_channels
@@ -54,7 +54,7 @@ class Trainer:
         
         
         # initialize dataloader
-        self.train_set = train_dataset(self.annotation_path, self.index_dict,
+        self.train_set = train_dataset(self.annotation_path, self.train_index_dict,
                                        img_dir = self.train_img_path,
                                        transform = self.transform)
         self.train_loader = DataLoader(dataset=self.train_set, batch_size=self.batch_size, shuffle=True)
