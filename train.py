@@ -12,7 +12,7 @@ import torch.nn.functional as f
 from torch.utils.data import DataLoader
 import torchvision
 
-from dataset import train_dataset, path_dict
+from dataset import create_dataset, path_dict
 
 from preprocess import image_process
 
@@ -24,8 +24,10 @@ from pretrain_VAE import VAE
 
 def get_args():
     parser = argparse.ArgumentParser(description = "Model Options")
-    parser.add_argument("--annotation_path", type=str, default="/Users/ianleefmans/Desktop/data/train/part1/part1_2.json", help="Path to annotation .json")
+    parser.add_argument("--train_annotation_path", type=str, default="/Users/ianleefmans/Desktop/data/train/part1/part1_2.json", help="Path to train annotation .json")
     parser.add_argument("--train_img_path", type=str, default="/Users/ianleefmans/Desktop/data/train", help="Path to training image folder")
+    parser.add_argument("--val_annotation_path", type=str, default="/Users/ianleefmans/Desktop/data/val/part3.json", help="Path to train annotation .json")
+    parser.add_argument("--val_img_path", type=str, default="/Users/ianleefmans/Desktop/data/val", help="Path to validation image folder")
     parser.add_argument("--batch_size", type=int, default=4, help="Mini-batch size")
     parser.add_argument("--number_of_channels", type=int, default=16, help="Number of channels to map to in first layer")
     parser.add_argument("--learning_rate", type=float, default=1e-3, help="Learning rate for Adam Optimizer")
@@ -41,9 +43,12 @@ class Trainer:
         # initialize arguments
         self.ops = get_args()
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-        self.annotation_path = self.ops.annotation_path
+        self.train_annotation_path = self.ops.train_annotation_path
         self.train_img_path = self.ops.train_img_path
-        self.train_index_dict = path_dict(self.train_img_path, 3328, 77)
+        self.val_annotation_path = self.ops.val_annotation_path
+        self.val_img_path = self.ops.val_img_path
+        self.train_index_dict = path_dict(self.train_img_path, 3329, 78)
+        self.val_index_dict = path_dict(self.val_img_path, 2424, 25, training=False)
         self.transform = torchvision.transforms.ToTensor()
         self.batch_size = self.ops.batch_size
         self.num_channels = self.ops.number_of_channels
@@ -54,10 +59,18 @@ class Trainer:
         
         
         # initialize dataloader
-        self.train_set = train_dataset(self.annotation_path, self.train_index_dict,
+        self.train_set = create_dataset(self.train_annotation_path, self.train_index_dict,
                                        img_dir = self.train_img_path,
-                                       transform = self.transform)
+                                       transform = self.transform, training=True)
         self.train_loader = DataLoader(dataset=self.train_set, batch_size=self.batch_size, shuffle=True)
+        
+        
+        self.val_set = create_dataset(self.val_annotation_path, self.val_index_dict,
+                                        img_dir = self.val_img_path,
+                                        transform = self.transform, training=False)
+        self.val_loader = DataLoader(dataset=self.val_set, batch_size=self.batch_size, shuffle=True)
+        
+        
 
 
         #initialize models
@@ -112,9 +125,13 @@ class Trainer:
 
             #Testing
 
+    def testing(self):
 
-
-
+        sample = iter(self.val_loader).next()
+        print(sample['image'][0].size())
+        print(sample['image'].size())
+        plt.imshow(torchvision.transforms.ToPILImage(mode='RGB')(sample['image'][0]))
+        pass
 
 
 
@@ -129,7 +146,7 @@ class Trainer:
 
 if __name__ == "__main__":
     trainer = Trainer()
-    trainer.train()
+    trainer.testing()
 
 
 
