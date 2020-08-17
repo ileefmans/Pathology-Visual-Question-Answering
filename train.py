@@ -5,6 +5,7 @@ import pandas as pd
 import argparse
 from matplotlib import pyplot as plt
 from IPython import display
+from tqdm import tqdm
 
 import torch
 from torch import nn
@@ -106,14 +107,16 @@ class Trainer:
 
     def train(self):
         codes = dict(mulis=list(), logsig2=list(), y=list())
+   
         for epoch in range(0, self.epochs+1):
+            
             
             #Training
             if epoch>0:
                 self.vae.train()
                 train_loss=0
-                i = 1
-                for x in self.train_loader:
+                #i = 1
+                for x in tqdm(self.train_loader, desc= "Train Epoch "+str(epoch)):
                     x = x["image"].to(self.device)
                     x_hat, mu, logvar = self.vae(x)
                     loss = self.loss_fcn(x_hat, x, mu, logvar)
@@ -123,11 +126,11 @@ class Trainer:
                     self.optim.step()
                     #print('minibatch:', i)
                     
-                    print("[EPOCH]: %i, [MINIBATCH]: %i,   %.2f [PERCENT COMPLETED]" % (epoch, i, (i/len(self.train_loader))*100))
-                    display.clear_output(wait=True)
-    
+                    #print("[EPOCH]: %i, [MINIBATCH]: %i,   %.2f [PERCENT COMPLETED]" % (epoch, i, (i/len(self.train_loader))*100))
+                    #display.clear_output(wait=False)
                     
-                    i+=1
+                    
+                    #i+=1
                 print(f'====> Epoch: {epoch} Average loss: {train_loss / len(self.train_loader.dataset):.4f}')
 
 
@@ -137,16 +140,20 @@ class Trainer:
             with torch.no_grad():
                 self.vae.eval()
                 test_loss=0
-                for x in self.val_loader:
+                #i=1
+                for x in tqdm(self.val_loader, desc="Val Epoch "+str(epoch)):
                     x = x["image"].to(self.device)
                     x_hat, mu, logvar = self.vae(x)
                     test_loss += self.loss_fcn(x_hat, x, mu, logvar).item()
                     means.append(mu.detach())
                     logvars.append(logvar.detach())
+                    #print("[EPOCH]: %i, [MINIBATCH]: %i,   %.2f [PERCENT COMPLETED]" % (epoch, i, (i/len(self.val_loader))*100))
+                    #display.clear_output(wait=False)
+                    #i+=1
 
             codes['mulis'].append(torch.cat(means))
             codes['logsig2'].append(torch.cat(logvars))
-            test_loss /= len(self.test_loader.dataset)
+            test_loss /= len(self.val_loader.dataset)
             print(f'====> Test set loss: {test_loss:.4f}')
 
 

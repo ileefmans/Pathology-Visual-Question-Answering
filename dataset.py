@@ -86,18 +86,27 @@ class create_dataset(torch.utils.data.Dataset):
         
         self.img_dir = img_dir
         self.annotation = pd.read_json(annotation_dir)
-        self.new_annotation = self.annotation.loc[self.annotation.Images!='img_233',:].reset_index()
         self.training = training
+        
+        self.val_list=  [615, 657, 992, 1001, 1237, 1247, 1260, 1419, 1705, 1996, 2237]
+        if self.training==True:
+            self.new_annotation = self.annotation.loc[self.annotation.Images!='img_233',:].reset_index()
+        else:
+            self.new_annotation = self.annotation.loc[~self.annotation.Images.isin(self.val_list),:].reset_index()
+        
+        
         self.train_dict2 = train_dict
         self.transform = transform
         self.img_size = img_size
         self.preprocess = image_process(self.img_size)
+    
 
     
     def __len__(self):
         return len(self.new_annotation)
     
     def __getitem__(self, index):
+        
     
         image_name = self.new_annotation.Images[index]
         
@@ -114,7 +123,7 @@ class create_dataset(torch.utils.data.Dataset):
                 #print(img_path)
         else:
             img_path = os.path.join(self.img_dir, f'pic/{self.train_dict2[int(image_name)]}/{image_name}.jpg')
-            print(img_path)
+            #print(img_path)
     
     
     
