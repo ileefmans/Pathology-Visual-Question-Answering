@@ -88,8 +88,16 @@ class Trainer:
         return BCE+KLD
 
 
-    def testing(self):
+    def training(self):
         sample = iter(self.dataloader).next()
+        print(sample['image'][0].size())
+        print(sample['image'].size())
+        plt.imshow(torchvision.transforms.ToPILImage(mode='RGB')(sample['image'][0]))
+        pass
+    
+    def testing(self):
+        
+        sample = iter(self.val_loader).next()
         print(sample['image'][0].size())
         print(sample['image'].size())
         plt.imshow(torchvision.transforms.ToPILImage(mode='RGB')(sample['image'][0]))
@@ -120,18 +128,31 @@ class Trainer:
     
                     
                     i+=1
-                print(f'====> Epoch: {epoch} Average loss: {train_loss / len(self.train_loader):.4f}')
+                print(f'====> Epoch: {epoch} Average loss: {train_loss / len(self.train_loader.dataset):.4f}')
 
 
             #Testing
+            means, logvars, labels = list(), list(), list()
 
-    def testing(self):
+            with torch.no_grad():
+                self.vae.eval()
+                test_loss=0
+                for x in self.val_loader:
+                    x = x.to(self.device)
+                    x_hat, mu, logvar = self.vae(x)
+                    test_loss += self.loss_fcn(x_hat, x, mu, logvar).item()
+                    means.append(mu.detach())
+                    logvars.append(logvar.detach())
 
-        sample = iter(self.val_loader).next()
-        print(sample['image'][0].size())
-        print(sample['image'].size())
-        plt.imshow(torchvision.transforms.ToPILImage(mode='RGB')(sample['image'][0]))
-        pass
+            codes['mulis'].append(torch.cat(means))
+            codes['logsig2'].append(torch.cat(logvars))
+            test_loss /= len(self.test_loader.dataset)
+            print(f'====> Test set loss: {test_loss:.4f}')
+
+
+
+
+
 
 
 
@@ -146,7 +167,7 @@ class Trainer:
 
 if __name__ == "__main__":
     trainer = Trainer()
-    trainer.testing()
+    trainer.train()
 
 
 

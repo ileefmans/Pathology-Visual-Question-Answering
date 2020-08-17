@@ -136,10 +136,14 @@ class VAE(nn.Module):
 
 
     def reparameterize(self, mu, logvar):
-        std= logvar.mul(0.5).exp_()
-        eps1 = std.data.new(std.size()).normal_()
-        eps = std.data.new(std.size()).normal_()
-        return torch.cat((eps1.mul(std).add_(mu), eps.mul(std).add_(mu)), 1)
+        if self.training:
+            std= logvar.mul(0.5).exp_()
+            eps1 = std.data.new(std.size()).normal_()
+            eps = std.data.new(std.size()).normal_()
+            return torch.cat((eps1.mul(std).add_(mu), eps.mul(std).add_(mu)), 1)
+        else:
+            return torch.cat(mu, mu, 1)
+
 
     def forward(self, x):
         x, idx, dimensions, prepool_dim = self.Encoder(x)
