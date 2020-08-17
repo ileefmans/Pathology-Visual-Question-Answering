@@ -138,7 +138,7 @@ class Trainer:
                 self.vae.eval()
                 test_loss=0
                 for x in self.val_loader:
-                    x = x.to(self.device)
+                    x = x["image"].to(self.device)
                     x_hat, mu, logvar = self.vae(x)
                     test_loss += self.loss_fcn(x_hat, x, mu, logvar).item()
                     means.append(mu.detach())
