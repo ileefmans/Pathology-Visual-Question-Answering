@@ -142,7 +142,7 @@ class VAE(nn.Module):
             eps = std.data.new(std.size()).normal_()
             return torch.cat((eps1.mul(std).add_(mu), eps.mul(std).add_(mu)), 1)
         else:
-            return torch.cat(mu, mu, 1)
+            return torch.cat((mu, mu), 1)
 
 
     def forward(self, x):
