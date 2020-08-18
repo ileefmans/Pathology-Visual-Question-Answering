@@ -90,7 +90,7 @@ class create_dataset(torch.utils.data.Dataset):
         
         self.val_list=  [615, 657, 992, 1001, 1237, 1247, 1260, 1419, 1705, 1996, 2237]
         if self.training==True:
-            self.new_annotation = self.annotation.loc[self.annotation.Images!='img_233',:].reset_index()
+            self.new_annotation = self.annotation.loc[~self.annotation.Images.isin(['img_233']),:].reset_index()
         else:
             self.new_annotation = self.annotation.loc[~self.annotation.Images.isin(self.val_list),:].reset_index()
         
@@ -152,7 +152,7 @@ class create_dataset(torch.utils.data.Dataset):
         answer = self.new_annotation.Answers[index]
         sample = {'image': image, 'question': question, 'answer': answer}
     
-        return sample
+        return image
 
 
 

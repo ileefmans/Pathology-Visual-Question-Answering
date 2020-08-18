@@ -63,13 +63,13 @@ class Trainer:
         self.train_set = create_dataset(self.train_annotation_path, self.train_index_dict,
                                        img_dir = self.train_img_path,
                                        transform = self.transform, training=True)
-        self.train_loader = DataLoader(dataset=self.train_set, batch_size=self.batch_size, shuffle=True)
+        self.train_loader = DataLoader(dataset=self.train_set, batch_size=self.batch_size, num_workers=self.batch_size, shuffle=True)
         
         
         self.val_set = create_dataset(self.val_annotation_path, self.val_index_dict,
                                         img_dir = self.val_img_path,
                                         transform = self.transform, training=False)
-        self.val_loader = DataLoader(dataset=self.val_set, batch_size=self.batch_size, shuffle=True)
+        self.val_loader = DataLoader(dataset=self.val_set, batch_size=self.batch_size, num_workers = self.batch_size, shuffle=True)
         
         
 
@@ -106,6 +106,9 @@ class Trainer:
 
 
     def train(self):
+        
+        print("\n \n \n Training and Validaation Results: \n \n")
+        
         codes = dict(mulis=list(), logsig2=list(), y=list())
    
         for epoch in range(0, self.epochs+1):
@@ -117,7 +120,7 @@ class Trainer:
                 train_loss=0
                 #i = 1
                 for x in tqdm(self.train_loader, desc= "Train Epoch "+str(epoch)):
-                    x = x["image"].to(self.device)
+                    x = x.to(self.device)
                     x_hat, mu, logvar = self.vae(x)
                     loss = self.loss_fcn(x_hat, x, mu, logvar)
                     train_loss += loss
@@ -142,7 +145,7 @@ class Trainer:
                 test_loss=0
                 #i=1
                 for x in tqdm(self.val_loader, desc="Val Epoch "+str(epoch)):
-                    x = x["image"].to(self.device)
+                    x = x.to(self.device)
                     x_hat, mu, logvar = self.vae(x)
                     test_loss += self.loss_fcn(x_hat, x, mu, logvar).item()
                     means.append(mu.detach())
