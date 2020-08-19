@@ -41,7 +41,7 @@ def get_args():
 class Trainer:
     def __init__(self):
         
-        # initialize arguments
+        # Initialize Arguments
         self.ops = get_args()
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.train_annotation_path = self.ops.train_annotation_path
@@ -59,10 +59,8 @@ class Trainer:
         self.epochs = self.ops.epochs
         
         
-        # initialize dataloader
-        
-        #-----------------------------------------------------------------------------------------
-        # New portion
+
+        # Preprocess Questions and Answers
         
         self.train_annotation = pd.read_json(self.train_annotation_path)
         self.train_annotation = self.train_annotation.loc[~self.train_annotation.Images.isin(['img_233']),:].reset_index()
@@ -89,7 +87,7 @@ class Trainer:
         
   
         
-        #-----------------------------------------------------------------------------------------
+        # Initialize Dataloaders
         self.train_set = create_dataset(self.train_annotation_path, self.train_questions, self.train_answers,
                                         self.train_index_dict, img_dir = self.train_img_path,
                                         transform = self.transform, training=True)
@@ -104,21 +102,21 @@ class Trainer:
         
 
 
-        #initialize models
+        #Initialize Models
         self.vae = VAE(self.num_channels).to(self.device)
         
         
-        #initialize optimizer
+        #Initialize Optimizer
         self.optim = torch.optim.Adam(self.vae.parameters(), lr = self.learning_rate)
     
     
-    # Loss Function
+    # Define Loss Function
     def loss_fcn(self, x_hat, x, mu, logvar):
         BCE = nn.functional.binary_cross_entropy(x_hat.view(-1, 3*self.height*self.width), x.view(-1, 3*self.height*self.width),  reduction='sum')
         KLD = 0.5 * torch.sum(logvar.exp() - logvar - 1 + mu.pow(2))
         return BCE+KLD
 
-
+    # Functions to Test if Data is Loaded Correctly
     def training(self):
         sample = iter(self.dataloader).next()
         print(sample['image'][0].size())
@@ -135,6 +133,8 @@ class Trainer:
         pass
 
 
+
+    # TRAINING
     def train(self):
         
         print("\n \n \n Training and Validaation Results: \n \n")
@@ -148,7 +148,7 @@ class Trainer:
             if epoch>0:
                 self.vae.train()
                 train_loss=0
-                #i = 1
+
                 for x, question, answer in tqdm(self.train_loader, desc= "Train Epoch "+str(epoch)):
                     x = x.to(self.device)
                     x_hat, mu, logvar = self.vae(x)
@@ -157,13 +157,7 @@ class Trainer:
                     self.optim.zero_grad()
                     loss.backward()
                     self.optim.step()
-                    #print('minibatch:', i)
-                    
-                    #print("[EPOCH]: %i, [MINIBATCH]: %i,   %.2f [PERCENT COMPLETED]" % (epoch, i, (i/len(self.train_loader))*100))
-                    #display.clear_output(wait=False)
-                    
-                    
-                    #i+=1
+                
                 print(f'====> Epoch: {epoch} Average loss: {train_loss / len(self.train_loader.dataset):.4f}')
 
 
@@ -173,30 +167,18 @@ class Trainer:
             with torch.no_grad():
                 self.vae.eval()
                 test_loss=0
-                #i=1
+                
                 for x, question, answer in tqdm(self.val_loader, desc="Val Epoch "+str(epoch)):
                     x = x.to(self.device)
                     x_hat, mu, logvar = self.vae(x)
                     test_loss += self.loss_fcn(x_hat, x, mu, logvar).item()
                     means.append(mu.detach())
                     logvars.append(logvar.detach())
-                    #print("[EPOCH]: %i, [MINIBATCH]: %i,   %.2f [PERCENT COMPLETED]" % (epoch, i, (i/len(self.val_loader))*100))
-                    #display.clear_output(wait=False)
-                    #i+=1
 
             codes['mulis'].append(torch.cat(means))
             codes['logsig2'].append(torch.cat(logvars))
             test_loss /= len(self.val_loader.dataset)
             print(f'====> Test set loss: {test_loss:.4f}')
-
-
-
-
-
-
-
-
-
 
 
 

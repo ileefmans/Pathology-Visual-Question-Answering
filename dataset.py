@@ -58,12 +58,6 @@ def path_dict(folder_path, total_pics, total_folders, training=True):
 
 
 
-
-
-
-
-
-
 # Class to create dataset with annotation
 class create_dataset(torch.utils.data.Dataset):
     def __init__(self, annotation_dir, questions, answers, train_dict, img_dir, transform=None, img_size=(491, 600), training=True):
@@ -152,12 +146,6 @@ class create_dataset(torch.utils.data.Dataset):
         
         
         
-        #question = self.new_annotation.Questions[index]
-        #print(question)
-        #print(type(question))
-        #cln_txt= text_process(question)
-        #question = cln_txt.text_preprocess()
-        #answer = self.new_annotation.Answers[index]
         #sample = {'image': image, 'question': question, 'answer': answer}
     
         return image, self.questions[index,:], self.answers[index,:]
