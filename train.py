@@ -75,7 +75,6 @@ class Trainer:
         
         
         self.val_list = [615, 657, 992, 1001, 1237, 1247, 1260, 1419, 1705, 1996, 2237]
-        
         self.val_annotation = pd.read_json(self.val_annotation_path)
         self.val_annotation = self.val_annotation.loc[~self.val_annotation.Images.isin(self.val_list),:].reset_index()
         
