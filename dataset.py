@@ -66,7 +66,7 @@ def path_dict(folder_path, total_pics, total_folders, training=True):
 
 # Class to create dataset with annotation
 class create_dataset(torch.utils.data.Dataset):
-    def __init__(self, annotation_dir, train_dict, img_dir, transform=None, img_size=(491, 600), training=True):
+    def __init__(self, annotation_dir, questions, answers, train_dict, img_dir, transform=None, img_size=(491, 600), training=True):
         """
             Args:
             
@@ -76,16 +76,24 @@ class create_dataset(torch.utils.data.Dataset):
                 train data
             
             img_dir (string): Train Directory with images
+            
+            questions (torch.Tensor): Tensor of vectorized questions
+            
+            answers (torch.Tensor): Tensor of vectorized answers
                 
             transform (callable, optional): Optional transform to be applied
                 on a sample
             
             img_size (tuple): (height, width) Desired height and width for all images to conform to. Height
                 must equal width.
+            
+            training (boolean): Whether or not dataset is training set
             """
         
         self.img_dir = img_dir
         self.annotation = pd.read_json(annotation_dir)
+        self.questions = questions
+        self.answers = answers
         self.training = training
         
         self.val_list=  [615, 657, 992, 1001, 1237, 1247, 1260, 1419, 1705, 1996, 2237]
@@ -144,7 +152,7 @@ class create_dataset(torch.utils.data.Dataset):
         
         
         
-        question = self.new_annotation.Questions[index]
+        #question = self.new_annotation.Questions[index]
         #print(question)
         #print(type(question))
         #cln_txt= text_process(question)
@@ -152,7 +160,7 @@ class create_dataset(torch.utils.data.Dataset):
         answer = self.new_annotation.Answers[index]
         sample = {'image': image, 'question': question, 'answer': answer}
     
-        return image
+        return image, self.questions[index,:], self.answers[index,:]
 
 
 
