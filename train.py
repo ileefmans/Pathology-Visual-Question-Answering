@@ -65,6 +65,7 @@ class Trainer:
         # New portion
         
         self.train_annotation = pd.read_json(self.train_annotation_path)
+        self.train_annotation = self.train_annotation.loc[~self.train_annotation.Images.isin(['img_233']),:].reset_index()
 
         self.clean_train_ques = text_process(self.train_annotation.Questions)
         self.train_questions = torch.tensor(self.clean_train_ques.text_preprocess()[0])
@@ -75,9 +76,10 @@ class Trainer:
         
         
         
-        
+        self.val_list = [615, 657, 992, 1001, 1237, 1247, 1260, 1419, 1705, 1996, 2237]
         
         self.val_annotation = pd.read_json(self.val_annotation_path)
+        self.val_annotation = self.val_annotation.loc[~self.val_annotation.Images.isin(self.val_list),:].reset_index()
         
         self.clean_val_ques = text_process(self.val_annotation.Questions)
         self.val_questions = torch.tensor(self.clean_val_ques.text_preprocess()[0])
@@ -85,17 +87,7 @@ class Trainer:
         self.clean_val_ans = text_process(self.val_annotation.Answers)
         self.val_answers = torch.tensor(self.clean_val_ans.text_preprocess()[0])
         
-        
-        
-        
-        
-
-        
-        
-        
-        
-        
-        
+  
         
         #-----------------------------------------------------------------------------------------
         self.train_set = create_dataset(self.train_annotation_path, self.train_questions, self.train_answers,
@@ -104,7 +96,7 @@ class Trainer:
         self.train_loader = DataLoader(dataset=self.train_set, batch_size=self.batch_size, num_workers=self.batch_size, shuffle=True)
         
         
-        self.val_set = create_dataset(self.val_annotation_path, self.val_questions, self.val_answers
+        self.val_set = create_dataset(self.val_annotation_path, self.val_questions, self.val_answers,
                                       self.val_index_dict, img_dir = self.val_img_path,
                                       transform = self.transform, training=False)
         self.val_loader = DataLoader(dataset=self.val_set, batch_size=self.batch_size, num_workers = self.batch_size, shuffle=True)
