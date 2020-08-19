@@ -60,9 +60,40 @@ class Trainer:
         
         
         # initialize dataloader
-        self.train_set = create_dataset(self.train_annotation_path, self.train_index_dict,
-                                       img_dir = self.train_img_path,
-                                       transform = self.transform, training=True)
+        
+        #-----------------------------------------------------------------------------------------
+        # New portion
+        
+        self.train_annotation = pd.read_json(self.train_annotation_path)
+
+        self.clean_ques = text_process(self.train_annotation.Questions)
+        self.train_questions = torch.tensor(self.clean_ques.text_preprocess()[0])
+        
+
+        self.clean_ans = text_process(self.train_annotation.Answers)
+        self.train_answers = torch.tensor(self.clean_ans.text_preprocess()[0])
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+
+        
+        
+        
+        
+        
+        
+        
+        #-----------------------------------------------------------------------------------------
+        self.train_set = create_dataset(self.train_annotation_path, self.train_questions, self.train_answers,
+                                        self.train_index_dict, img_dir = self.train_img_path,
+                                        transform = self.transform, training=True)
         self.train_loader = DataLoader(dataset=self.train_set, batch_size=self.batch_size, num_workers=self.batch_size, shuffle=True)
         
         
