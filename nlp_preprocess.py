@@ -28,7 +28,7 @@ class text_process:
         
         doc_list = []
         for i in self.text:
-            doc_list.append(i)
+            doc_list.append(str(i))
             
         return doc_list
         

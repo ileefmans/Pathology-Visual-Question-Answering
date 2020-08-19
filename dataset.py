@@ -157,8 +157,8 @@ class create_dataset(torch.utils.data.Dataset):
         #print(type(question))
         #cln_txt= text_process(question)
         #question = cln_txt.text_preprocess()
-        answer = self.new_annotation.Answers[index]
-        sample = {'image': image, 'question': question, 'answer': answer}
+        #answer = self.new_annotation.Answers[index]
+        #sample = {'image': image, 'question': question, 'answer': answer}
     
         return image, self.questions[index,:], self.answers[index,:]
 

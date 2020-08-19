@@ -66,17 +66,24 @@ class Trainer:
         
         self.train_annotation = pd.read_json(self.train_annotation_path)
 
-        self.clean_ques = text_process(self.train_annotation.Questions)
-        self.train_questions = torch.tensor(self.clean_ques.text_preprocess()[0])
+        self.clean_train_ques = text_process(self.train_annotation.Questions)
+        self.train_questions = torch.tensor(self.clean_train_ques.text_preprocess()[0])
         
 
-        self.clean_ans = text_process(self.train_annotation.Answers)
-        self.train_answers = torch.tensor(self.clean_ans.text_preprocess()[0])
+        self.clean_train_ans = text_process(self.train_annotation.Answers)
+        self.train_answers = torch.tensor(self.clean_train_ans.text_preprocess()[0])
         
         
         
         
         
+        self.val_annotation = pd.read_json(self.val_annotation_path)
+        
+        self.clean_val_ques = text_process(self.val_annotation.Questions)
+        self.val_questions = torch.tensor(self.clean_val_ques.text_preprocess()[0])
+        
+        self.clean_val_ans = text_process(self.val_annotation.Answers)
+        self.val_answers = torch.tensor(self.clean_val_ans.text_preprocess()[0])
         
         
         
@@ -97,9 +104,9 @@ class Trainer:
         self.train_loader = DataLoader(dataset=self.train_set, batch_size=self.batch_size, num_workers=self.batch_size, shuffle=True)
         
         
-        self.val_set = create_dataset(self.val_annotation_path, self.val_index_dict,
-                                        img_dir = self.val_img_path,
-                                        transform = self.transform, training=False)
+        self.val_set = create_dataset(self.val_annotation_path, self.val_questions, self.val_answers
+                                      self.val_index_dict, img_dir = self.val_img_path,
+                                      transform = self.transform, training=False)
         self.val_loader = DataLoader(dataset=self.val_set, batch_size=self.batch_size, num_workers = self.batch_size, shuffle=True)
         
         
@@ -150,7 +157,7 @@ class Trainer:
                 self.vae.train()
                 train_loss=0
                 #i = 1
-                for x in tqdm(self.train_loader, desc= "Train Epoch "+str(epoch)):
+                for x, question, answer in tqdm(self.train_loader, desc= "Train Epoch "+str(epoch)):
                     x = x.to(self.device)
                     x_hat, mu, logvar = self.vae(x)
                     loss = self.loss_fcn(x_hat, x, mu, logvar)
@@ -175,7 +182,7 @@ class Trainer:
                 self.vae.eval()
                 test_loss=0
                 #i=1
-                for x in tqdm(self.val_loader, desc="Val Epoch "+str(epoch)):
+                for x, question, answer in tqdm(self.val_loader, desc="Val Epoch "+str(epoch)):
                     x = x.to(self.device)
                     x_hat, mu, logvar = self.vae(x)
                     test_loss += self.loss_fcn(x_hat, x, mu, logvar).item()
