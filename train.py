@@ -158,7 +158,7 @@ class Trainer:
                     self.optim.zero_grad()
                     loss.backward()
                     self.optim.step()
-                self.save_model(self.vae, self.optim, "VAE", epoch)
+                self.save_model(self.vae, self.optim, "VAE", epoch, train_loss)
                 
                 print(f'====> Epoch: {epoch} Average loss: {train_loss / len(self.train_loader.dataset):.4f}')
 
@@ -185,7 +185,7 @@ class Trainer:
 
 
     # SAVE MODEL PARAMETERS
-    def save_model(self, model, optimizer, model_name, epoch):
+    def save_model(self, model, optimizer, model_name, epoch, loss):
         save_path = os.path.join(self.save_path, model_name)
 
         if not os.path.exists(save_path):
