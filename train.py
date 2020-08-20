@@ -33,6 +33,7 @@ def get_args():
     parser.add_argument("--number_of_channels", type=int, default=16, help="Number of channels to map to in first layer")
     parser.add_argument("--learning_rate", type=float, default=1e-3, help="Learning rate for Adam Optimizer")
     parser.add_argument("--epochs", type=int, default=10, help="Number of epochs model will be trained for")
+    parser.add_argument("--save_path", type=str, default="/Users/ianleefmans/Desktop/model-parameters", help="Path to folder to save model parameters after trained")
 
     return parser.parse_args()
 
@@ -57,6 +58,7 @@ class Trainer:
         self.height = 491
         self.width = 600
         self.epochs = self.ops.epochs
+        self.save_path = self.ops.save_path
         
         
 
@@ -179,6 +181,14 @@ class Trainer:
             test_loss /= len(self.val_loader.dataset)
             print(f'====> Test set loss: {test_loss:.4f}')
 
+
+
+    # SAVE MODEL PARAMETERS
+    def save_model(self, model_name):
+        save_path = os.path.join(self.save_path, model_name)
+
+        if not os.path.exists(save_path):
+            os.makedirs(save_path)
 
 
 
