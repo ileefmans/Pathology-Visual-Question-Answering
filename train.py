@@ -208,7 +208,7 @@ class Trainer:
         epoch = checkpoint["epoch"]
         loss = checkpoint["loss"]
 
-        return epoch loss
+        return epoch, loss
 
 
 
