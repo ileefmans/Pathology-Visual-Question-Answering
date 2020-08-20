@@ -158,6 +158,7 @@ class Trainer:
                     self.optim.zero_grad()
                     loss.backward()
                     self.optim.step()
+                self.save_model(self.vae, self.optim, "VAE", epoch)
                 
                 print(f'====> Epoch: {epoch} Average loss: {train_loss / len(self.train_loader.dataset):.4f}')
 
