@@ -184,11 +184,36 @@ class Trainer:
 
 
     # SAVE MODEL PARAMETERS
-    def save_model(self, model_name):
+    def save_model(self, model, optimizer, model_name, epoch):
         save_path = os.path.join(self.save_path, model_name)
 
         if not os.path.exists(save_path):
             os.makedirs(save_path)
+
+        torch.save({
+                   "epoch": epoch,
+                   "model_state_dict": model.state_dict(),
+                   "optimizer_state_dict": optimizer.state_dict(),
+                   "loss": loss
+                   }, save_path)
+
+
+    # LOAD MODEL PARAMETERS
+    def load_model(self, model, optimizer, model_name):
+        load_path = os.path.join(self.save_path, model_name)
+        checkpoint = torch.load(load_path)
+        model.load_state_dict(checkpoint["model_state_dict"])
+        optimizer.load_state_dict(checkpoint["optimizer_dict_state"])
+        epoch = checkpoint["epoch"]
+        loss = checkpoint["loss"]
+
+        return epoch loss
+
+
+
+
+
+
 
 
 
