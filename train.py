@@ -144,14 +144,15 @@ class Trainer:
 
 
     # TRAINING
-    def train(self, load_weights):
+    def train(self):
         """
             Training Function
         """
         
-        if load_weights is True:
+        if self.load_weights is True:
             start_epoch, loss = self.load_model(self.vae, self.optim, "VAE")
             start_epoch+=1
+            print("\n \n [WEIGHTS LOADED]")
         else:
             start_epoch = 0
         
@@ -169,7 +170,6 @@ class Trainer:
             if epoch>0:
                 self.vae.train()
                 train_loss=0
-
                 for x, question, answer in tqdm(self.train_loader, desc= "Train Epoch "+str(epoch)):
                     x = x.to(self.device)
                     x_hat, mu, logvar = self.vae(x)
@@ -178,9 +178,10 @@ class Trainer:
                     self.optim.zero_grad()
                     loss.backward()
                     self.optim.step()
+                
                 self.save_model(self.vae, self.optim, "VAE", epoch, train_loss)
                 
-                print(f'====> Epoch: {epoch} Average loss: {train_loss / len(self.train_loader.dataset):.4f}')
+                print(f'====> Epoch: {epoch} Average loss: {train_loss / len(self.train_loader.dataset):.4f}\n')
 
 
             #Testing
@@ -202,6 +203,8 @@ class Trainer:
             test_loss /= len(self.val_loader.dataset)
             print(f'====> Test set loss: {test_loss:.4f}')
 
+        print("[DONE]")
+
 
 
     # SAVE MODEL PARAMETERS
@@ -214,12 +217,8 @@ class Trainer:
         if not os.path.exists(save_path):
             os.makedirs(save_path)
 
-        torch.save({
-                   "epoch": epoch,
-                   "model_state_dict": model.state_dict(),
-                   "optimizer_state_dict": optimizer.state_dict(),
-                   "loss": loss
-                   }, save_path)
+        torch.save({"epoch": epoch, "model_state_dict": model.state_dict(),
+                   "optimizer_state_dict": optimizer.state_dict(), "loss": loss}, save_path+"/params.tar")
 
 
     # LOAD MODEL PARAMETERS
@@ -227,10 +226,10 @@ class Trainer:
         """
            Function for loading model parameters 
         """
-        load_path = os.path.join(self.save_path, model_name)
+        load_path = os.path.join(self.save_path, model_name, "params.tar")
         checkpoint = torch.load(load_path)
         model.load_state_dict(checkpoint["model_state_dict"])
-        optimizer.load_state_dict(checkpoint["optimizer_dict_state"])
+        optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
         epoch = checkpoint["epoch"]
         loss = checkpoint["loss"]
 
@@ -250,7 +249,7 @@ class Trainer:
 
 if __name__ == "__main__":
     trainer = Trainer()
-    trainer.train(self.load_weights)
+    trainer.train()
 
 
 
