@@ -41,6 +41,9 @@ def get_args():
 
 
 class Trainer:
+    """ 
+        Class for training project models
+    """
     def __init__(self):
         
         # Initialize Arguments
@@ -115,6 +118,9 @@ class Trainer:
     
     # Define Loss Function
     def loss_fcn(self, x_hat, x, mu, logvar):
+        """
+            Loss function used for training Variational Autoencoder (pretraining model)
+        """
         BCE = nn.functional.binary_cross_entropy(x_hat.view(-1, 3*self.height*self.width), x.view(-1, 3*self.height*self.width),  reduction='sum')
         KLD = 0.5 * torch.sum(logvar.exp() - logvar - 1 + mu.pow(2))
         return BCE+KLD
@@ -139,6 +145,9 @@ class Trainer:
 
     # TRAINING
     def train(self, load_weights):
+        """
+            Training Function
+        """
         
         if load_weights is True:
             start_epoch, loss = self.load_model(self.vae, self.optim, "VAE")
@@ -197,6 +206,9 @@ class Trainer:
 
     # SAVE MODEL PARAMETERS
     def save_model(self, model, optimizer, model_name, epoch, loss):
+        """
+            Function for saving model parameters
+        """
         save_path = os.path.join(self.save_path, model_name)
 
         if not os.path.exists(save_path):
@@ -212,6 +224,9 @@ class Trainer:
 
     # LOAD MODEL PARAMETERS
     def load_model(self, model, optimizer, model_name):
+        """
+           Function for loading model parameters 
+        """
         load_path = os.path.join(self.save_path, model_name)
         checkpoint = torch.load(load_path)
         model.load_state_dict(checkpoint["model_state_dict"])
