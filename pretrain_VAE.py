@@ -113,6 +113,9 @@ class VAE(nn.Module):
         return x, idx, pic_dim, prepool_dim
     
     def Decoder(self, x, idx, prepool_dim):
+        """
+           Decoder segment of Variational AutoEncoder
+        """
         
         unpool1 = nn.MaxUnpool2d(kernel_size=2)
         unpool2 = nn.MaxUnpool2d(kernel_size=2)
@@ -136,6 +139,10 @@ class VAE(nn.Module):
 
 
     def reparameterize(self, mu, logvar):
+        """
+           Function for reparameterization of Variational Autoencoder:
+                Samples from a Guassian Distribution
+        """
         if self.training:
             std= logvar.mul(0.5).exp_()
             eps1 = std.data.new(std.size()).normal_()
