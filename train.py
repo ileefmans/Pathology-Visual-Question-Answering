@@ -34,6 +34,7 @@ def get_args():
     parser.add_argument("--learning_rate", type=float, default=1e-3, help="Learning rate for Adam Optimizer")
     parser.add_argument("--epochs", type=int, default=10, help="Number of epochs model will be trained for")
     parser.add_argument("--save_path", type=str, default="/Users/ianleefmans/Desktop/model-parameters", help="Path to folder to save model parameters after trained")
+    parser.add_argument("--load_weights", type=bool, default=False, help="Determines whether or not pretrained weights will be loaded during training")
 
     return parser.parse_args()
 
@@ -59,6 +60,7 @@ class Trainer:
         self.width = 600
         self.epochs = self.ops.epochs
         self.save_path = self.ops.save_path
+        self.load_weights = self.ops.load_weights
         
         
 
@@ -136,13 +138,22 @@ class Trainer:
 
 
     # TRAINING
-    def train(self):
+    def train(self, load_weights):
+        
+        if load_weights is True:
+            start_epoch, loss = self.load_model(self.vae, self.optim, "VAE")
+            start_epoch+=1
+        else:
+            start_epoch = 0
+        
+        
+        
         
         print("\n \n \n Training and Validaation Results: \n \n")
         
         codes = dict(mulis=list(), logsig2=list(), y=list())
    
-        for epoch in range(0, self.epochs+1):
+        for epoch in range(start_epoch, self.epochs+1):
             
             
             #Training
@@ -224,7 +235,7 @@ class Trainer:
 
 if __name__ == "__main__":
     trainer = Trainer()
-    trainer.train()
+    trainer.train(self.load_weights)
 
 
 
