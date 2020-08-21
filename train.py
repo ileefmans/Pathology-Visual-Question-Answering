@@ -33,7 +33,7 @@ def get_args():
     parser.add_argument("--number_of_channels", type=int, default=16, help="Number of channels to map to in first layer")
     parser.add_argument("--learning_rate", type=float, default=1e-3, help="Learning rate for Adam Optimizer")
     parser.add_argument("--epochs", type=int, default=10, help="Number of epochs model will be trained for")
-    parser.add_argument("--save_path", type=str, default="/Users/ianleefmans/Desktop/model-parameters", help="Path to folder to save model parameters after trained")
+    parser.add_argument("--save_path", type=str, default="/Users/ianleefmans/Desktop/Pathology-Visual-Question-Answering/model_checkpoints", help="Path to folder to save model parameters after trained")
     parser.add_argument("--load_weights", type=bool, default=False, help="Determines whether or not pretrained weights will be loaded during training")
 
     return parser.parse_args()
@@ -178,7 +178,7 @@ class Trainer:
                     self.optim.zero_grad()
                     loss.backward()
                     self.optim.step()
-                
+
                 self.save_model(self.vae, self.optim, "VAE", epoch, train_loss)
                 
                 print(f'====> Epoch: {epoch} Average loss: {train_loss / len(self.train_loader.dataset):.4f}\n')
