@@ -1,0 +1,4 @@
+# Add libraries that must be installed
+
+torch
+pillow
