@@ -2,3 +2,8 @@
 
 torch
 pillow
+bumpy
+pandas
+matplotlib
+skimage
+torchvision
