@@ -5,5 +5,5 @@ pillow
 numpy
 pandas
 matplotlib
-skimage
+scikit-image
 torchvision
