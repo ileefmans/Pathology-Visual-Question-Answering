@@ -1,5 +1,0 @@
-2020-09-05 11:13:05,894: DEBUG :   Tensor after Flatten and Fold is torch.Size([2, 2, 54912]),
-2020-09-05 11:13:05,899: DEBUG :   Tensor after Reparameterize is torch.Size([2, 109824]),
-2020-09-05 11:13:05,900: DEBUG :   Tensor after Unflatten is torch.Size([2, 128, 26, 33]),
-2020-09-05 11:13:06,608: DEBUG :   Tensor after Decoder is torch.Size([2, 3, 491, 600]),
-

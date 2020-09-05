@@ -6,8 +6,15 @@ import torchvision
 import logging
 import os
 
-logging.basicConfig(filename='pretrain_VAE.log', level=logging.DEBUG,
-                    format='%(asctime)s: %(levelname)s :%(message)s')
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s: %(levelname)s :%(message)s')
+file_handler = logging.FileHandler('logs/pretrain_VAE.log')
+file_handler.setLevel(logging.ERROR)
+file_handler.setFormatter(formatter)
+logger.addHandler(file_handler)
+
+
 
 
 
@@ -157,16 +164,16 @@ class VAE(nn.Module):
 
     def forward(self, x):
         x, idx, dimensions, prepool_dim = self.Encoder(x)
-        logging.debug("   Tensor after Flatten and Fold is {},".format(x.size()))
+        logger.debug("  Tensor after Flatten and Fold is {},".format(x.size()))
         mu = x[:,0,:]
         logvar = x[:,1,:]
         x = self.reparameterize(mu, logvar)
-        logging.debug("   Tensor after Reparameterize is {},".format(x.size()))
+        logger.debug("  Tensor after Reparameterize is {},".format(x.size()))
         unflatten = Unflatten(x, dimensions=dimensions, num_features = self.num_features)
         x = unflatten(x)
-        logging.debug("   Tensor after Unflatten is {},".format(x.size()))
+        logger.debug("  Tensor after Unflatten is {},".format(x.size()))
         x = self.Decoder(x, idx, prepool_dim)
-        logging.debug("   Tensor after Decoder is {},\n".format(x.size()))
+        logger.debug("  Tensor after Decoder is {},\n".format(x.size()))
         
         
         return x, mu, logvar
@@ -178,7 +185,10 @@ class VAE(nn.Module):
 
 
 
-
+if __name__ == '__main__':
+    x = torch.rand(4,3,491,600)
+    vae = VAE(16)
+    vae.forward(x)
 
 
 
