@@ -2,11 +2,11 @@ language: python
 
 python: "3.6"
 env:
-  - TESTFOLDER test_preprocess.py
-  _ TESTFOLDER test_preprocess.py
+  - TESTFOLDER=test_preprocess.py
+  _ TESTFOLDER=test_preprocess.py
 cache: pip
 install: "pip install -r requirements.txt"
-script: pytest $TESTFOLDER
+script: "$TESTFOLDER"
 
 notifications:
   email:
