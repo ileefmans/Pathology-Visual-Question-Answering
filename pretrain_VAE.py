@@ -3,11 +3,14 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as f
 import torchvision
-
+import logging
 import os
 
-# takeout part where tokens=list(tok.word_count)
-# use doclist instead because tokenizer already makes tokens obviously
+logging.basicConfig(filename='pretrain_VAE.log', level=logging.DEBUG,
+                    format='%(asctime)s: %(levelname)s :%(message)s')
+
+
+
 
 
 class Flatten(nn.Module):
@@ -154,23 +157,25 @@ class VAE(nn.Module):
 
     def forward(self, x):
         x, idx, dimensions, prepool_dim = self.Encoder(x)
-        #print("1,", x.size())
+        logging.debug("   Tensor after Flatten and Fold is {},".format(x.size()))
         mu = x[:,0,:]
         logvar = x[:,1,:]
         x = self.reparameterize(mu, logvar)
-        #print("2", x.size())
+        logging.debug("   Tensor after Reparameterize is {},".format(x.size()))
         unflatten = Unflatten(x, dimensions=dimensions, num_features = self.num_features)
         x = unflatten(x)
-        #print("3", x.size())
+        logging.debug("   Tensor after Unflatten is {},".format(x.size()))
         x = self.Decoder(x, idx, prepool_dim)
-        #print("4", x.size())
+        logging.debug("   Tensor after Decoder is {},\n".format(x.size()))
         
         
         return x, mu, logvar
 
 
 
-#### need to figure out what dimensons to pass to unflatten()
+
+
+
 
 
 
