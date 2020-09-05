@@ -3,11 +3,10 @@ language: python
 python: "3.6"
 cache: pip
 env:
-  - PARALLELIZE=true
+  - TESTSUITE=test_process.py
+  - TESTSUITE=test_process.py
 install: "pip install -r requirements.txt"
-script:  
-  - python test_preprocess.py
-  - python test_pretrain_VAE.py
+script: "bundle exec rake test:$TEST_SUITE"
 
 notifications:
   email:
