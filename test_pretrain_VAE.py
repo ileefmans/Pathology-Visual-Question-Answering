@@ -16,6 +16,7 @@ class test_image_process(unittest.TestCase):
 
     def test_VAE_output_size(self):
         self.assertEqual(VAE(16).forward(self.x)[0].size(), torch.Size([4,3,491,600]))
+        print("DONE PRETRAIN TESTS")
     
 
 

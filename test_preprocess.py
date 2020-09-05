@@ -52,6 +52,7 @@ class test_image_process(unittest.TestCase):
     def test_uniform_size_short_rectangle(self):
         self.assertEqual(image_process((700,400)).uniform_size(self.tensor3).size(), torch.Size([3, 700, 400]))
         self.assertEqual(image_process((600,500)).uniform_size(self.tensor3).size(), torch.Size([3, 600, 500]))
+        print("DONE PREPROCESS TEST")
 
 
 
