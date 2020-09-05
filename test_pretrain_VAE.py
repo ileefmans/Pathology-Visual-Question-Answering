@@ -7,11 +7,7 @@ class test_image_process(unittest.TestCase):
     
     def setUp(self):
         self.x = torch.rand(4,3,491,600)
-    
-    
-    
-    
-    
+
     
     
     def tearDown(self):

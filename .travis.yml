@@ -1,12 +1,17 @@
 language: python
-python:
-  - "3.6"
 
-cache: pip
-install: "pip install -r requirements.txt"
-script: 
-  - python unit_tests/test_preprocess.py
-  - python unit_tests/test_pretrain_VAE.py
+jobs:
+  include:
+  - name: "preprocess"
+  python: "3.6"
+  cache: pip
+  install: "pip install -r requirements.txt"
+  script:  python test_preprocess.py
+  -name: "pretrain"
+  python: "3.6"
+  cache: pip
+  install: "pip install -r requirements.txt"
+  script: python test_pretrain_VAE.py
 
 notifications:
   email:

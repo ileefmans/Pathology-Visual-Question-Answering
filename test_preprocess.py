@@ -22,15 +22,8 @@ class test_image_process(unittest.TestCase):
         self.tensor2 = torch.rand(3, 400, 400)
         self.tensor3 = torch.rand(3, 600, 400)
     
-    
-    
-    
-    
-    
-    
     def tearDown(self):
         pass
-
 
     def test_expand_square(self):
         self.assertEqual(image_process((400,600)).expand(self.image1).size, (400,400))
@@ -59,6 +52,8 @@ class test_image_process(unittest.TestCase):
     def test_uniform_size_short_rectangle(self):
         self.assertEqual(image_process((700,400)).uniform_size(self.tensor3).size(), torch.Size([3, 700, 400]))
         self.assertEqual(image_process((600,500)).uniform_size(self.tensor3).size(), torch.Size([3, 600, 500]))
+
+
 
 
 
