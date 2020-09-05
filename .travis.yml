@@ -1,10 +1,10 @@
 language: python
 
 python: "3.6"
+cache: pip
 env:
   - TESTFOLDER=test_preprocess.py
   _ TESTFOLDER=test_preprocess.py
-cache: pip
 install: "pip install -r requirements.txt"
 script: "$TESTFOLDER"
 
