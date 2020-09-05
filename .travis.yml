@@ -1,17 +1,13 @@
 language: python
 
-jobs:
-  include:
-  - name: "preprocess"
-  python: "3.6"
-  cache: pip
-  install: "pip install -r requirements.txt"
-  script:  python test_preprocess.py
-  -name: "pretrain"
-  python: "3.6"
-  cache: pip
-  install: "pip install -r requirements.txt"
-  script: python test_pretrain_VAE.py
+python: "3.6"
+cache: pip
+env:
+  - PARALLELIZE=true
+install: "pip install -r requirements.txt"
+script:  
+  - python test_preprocess.py
+  - python test_pretrain_VAE.py
 
 notifications:
   email:
