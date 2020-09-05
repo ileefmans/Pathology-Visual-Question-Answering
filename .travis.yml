@@ -4,10 +4,10 @@ python:
 
 cache: pip
 install: "pip install -r requirements.txt"
-env: 
-  - TESTFOLDER=unit_tests/test_preprocess.py
-  - TESTFOLDER=unit_tests/test_pretrain_VAE.py
-script: "bundle exec rspec $TESTFOLDER"
+env: TESTFOLDER=unit_tests
+script: 
+  - test_preprocess.py
+  - test_pretrain_VAE.py
 
 notifications:
   email:
