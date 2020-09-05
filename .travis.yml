@@ -4,10 +4,9 @@ python:
 
 cache: pip
 install: "pip install -r requirements.txt"
-env: TESTFOLDER=unit_tests
 script: 
-  - python test_preprocess.py
-  - python test_pretrain_VAE.py
+  - python unit_tests/test_preprocess.py
+  - python unit_tests/test_pretrain_VAE.py
 
 notifications:
   email:
