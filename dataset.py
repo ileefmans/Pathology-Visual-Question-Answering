@@ -108,46 +108,29 @@ class create_dataset(torch.utils.data.Dataset):
         return len(self.new_annotation)
     
     def __getitem__(self, index):
-        
-    
         image_name = self.new_annotation.Images[index]
-        
 
-
-
-        #print(image_name)
+        # Import images from corresponding path
         if self.training==True:
             if image_name[0] in ['F','i']:
                 img_path = os.path.join(self.img_dir, f'part1/Images/{image_name}.jpg')
-                #print(img_path)
             else:
                 img_path = os.path.join(self.img_dir, f'part2/part2_images/{self.train_dict2[int(image_name[:-4])]}/{image_name}')
-                #print(img_path)
         else:
             img_path = os.path.join(self.img_dir, f'pic/{self.train_dict2[int(image_name)]}/{image_name}.jpg')
-            #print(img_path)
-    
-    
-    
+
+        # Open image and convert to RGB
         image = Image.open(img_path)
-        
         if image.mode != 'RGB':
             image = image.convert('RGB')
         
-
+        # Expand or contract image keeping aspect ratio transform to tensor, add padding
         image = self.preprocess.expand(image)
-        
-
-
         if self.transform:
             image = self.transform(image)
-        
         image = self.preprocess.uniform_size(image)
-        
-        
-        
-        #sample = {'image': image, 'question': question, 'answer': answer}
-    
+
+
         return image, self.questions[index,:], self.answers[index,:]
 
 
