@@ -2,7 +2,7 @@
 ![GitHub repo size](https://img.shields.io/github/repo-size/ileefmans/Pathology-Visual-Question-Answering.svg)
 ![GitHub top language](https://img.shields.io/github/languages/top/ileefmans/Pathology-Visual-Question-Answering)
 # Automation of Pathology Question Answering  
-## Ian Leefmans and Nyla Ennels  
+### Ian Leefmans and Nyla Ennels  
   
 Applying computer vision and natural language processing in the medical field
 
