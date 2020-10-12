@@ -1,3 +1,6 @@
+![GitHub last commit](https://img.shields.io/github/last-commit/ileefmans/Pathology-Visual-Question-Answering)
+![GitHub repo size](https://img.shields.io/github/repo-size/ileefmans/Pathology-Visual-Question-Answering.svg)
+![GitHub top language](https://img.shields.io/github/languages/top/ileefmans/Pathology-Visual-Question-Answering)
 # Automation of Pathology Question Answering  
 ## Ian Leefmans and Nyla Ennels  
   
