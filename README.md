@@ -1,3 +1,4 @@
+![Travis (.com)](https://img.shields.io/travis/com/ileefmans/Pathology-Visual-Question-Answering)
 ![GitHub last commit](https://img.shields.io/github/last-commit/ileefmans/Pathology-Visual-Question-Answering)
 ![GitHub repo size](https://img.shields.io/github/repo-size/ileefmans/Pathology-Visual-Question-Answering.svg)
 ![GitHub top language](https://img.shields.io/github/languages/top/ileefmans/Pathology-Visual-Question-Answering)
