@@ -1,6 +1,6 @@
 ![NYU Data Science](https://img.shields.io/badge/NYU-Data%20Science-blueviolet)
 ![NYU Economics](https://img.shields.io/badge/NYU-Economics-blueviolet)
-![Villanova Economics](https://img.shields.io/badge/Villanova-Economics-blue/style/for-the-badge)  
+![Villanova Economics](https://img.shields.io/badge/Villanova-Economics-blue/?style=for-the-badge&logo=appveyor)  
 
 [![Build Status](https://travis-ci.com/ileefmans/Pathology-Visual-Question-Answering.svg?branch=master)](https://travis-ci.com/ileefmans/Pathology-Visual-Question-Answering)
 ![GitHub last commit](https://img.shields.io/github/last-commit/ileefmans/Pathology-Visual-Question-Answering)
